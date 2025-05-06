@@ -1,0 +1,43 @@
+{
+  "TeamAlpha": {
+    "password": "alpha123",
+    "points": 0,
+    "currentClue": "5",
+    "attempts": {},
+    "disqualified": false,
+    "totalIncorrectAttempts": 0
+  },
+  "TeamBeta": {
+    "password": "beta456",
+    "points": 0,
+    "currentClue": "5",
+    "attempts": {},
+    "disqualified": false,
+    "totalIncorrectAttempts": 0
+  },
+  "TeamGamma": {
+    "password": "gamma789",
+    "points": 0,
+    "currentClue": "5",
+    "attempts": {
+      "789": 1
+    },
+    "disqualified": false,
+    "totalIncorrectAttempts": 0
+  },
+  "admin": {
+    "password": "admin123",
+    "points": 0,
+    "currentClue": null,
+    "attempts": {},
+    "disqualified": false
+  },
+  "teamrock": {
+    "password": "rock89",
+    "points": 0,
+    "currentClue": "2",
+    "attempts": {},
+    "disqualified": false,
+    "totalIncorrectAttempts": 0
+  }
+}
