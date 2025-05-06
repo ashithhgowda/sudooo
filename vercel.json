@@ -1,17 +1,64 @@
 {
-    "version": 2,
-    "builds": [
-      { "src": "public/**", "use": "@vercel/static" },
-      { "src": "api/*.js", "use": "@vercel/node" }
-    ],
-    "routes": [
-      {
-        "src": "/api/(.*)",
-        "dest": "/api/$1"
-      },
-      {
-        "src": "/(.*)",
-        "dest": "/public/$1"
-      }
-    ]
-  }
+  "version": 2,
+  "builds": [
+    {
+      "src": "public/**/*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/login",
+      "dest": "/server.js",
+      "methods": ["POST"]
+    },
+    {
+      "src": "/submit-code",
+      "dest": "/server.js",
+      "methods": ["POST"]
+    },
+    {
+      "src": "/verify-clue",
+      "dest": "/server.js",
+      "methods": ["POST"]
+    },
+    {
+      "src": "/dashboard",
+      "dest": "/public/dashboard.html",
+      "status": 200
+    },
+    {
+      "src": "/admin",
+      "dest": "/public/admin.html",
+      "status": 200
+    },
+    {
+      "src": "/map",
+      "dest": "/public/map.html",
+      "status": 200
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/index.html",
+      "status": 200
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/dashboard.html",
+      "destination": "/dashboard"
+    },
+    {
+      "source": "/admin.html",
+      "destination": "/admin"
+    },
+    {
+      "source": "/map.html",
+      "destination": "/map"
+    }
+  ]
+}
