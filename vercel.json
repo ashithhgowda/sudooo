@@ -28,37 +28,19 @@
     },
     {
       "src": "/dashboard",
-      "dest": "/public/dashboard.html",
-      "status": 200
+      "dest": "/public/dashboard.html"
     },
     {
       "src": "/admin",
-      "dest": "/public/admin.html",
-      "status": 200
+      "dest": "/public/admin.html"
     },
     {
       "src": "/map",
-      "dest": "/public/map.html",
-      "status": 200
+      "dest": "/public/map.html"
     },
     {
       "src": "/(.*)",
-      "dest": "/public/index.html",
-      "status": 200
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/dashboard.html",
-      "destination": "/dashboard"
-    },
-    {
-      "source": "/admin.html",
-      "destination": "/admin"
-    },
-    {
-      "source": "/map.html",
-      "destination": "/map"
+      "dest": "/public/index.html"
     }
   ]
 }
