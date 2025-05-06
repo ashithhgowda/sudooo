@@ -2,9 +2,24 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
+const session = require('express-session'); // NEW
+const cookieParser = require('cookie-parser'); // NEW
 
 const app = express();
 const PORT = 3000;
+
+// NEW: Session middleware (add right after app initialization)
+app.use(cookieParser());
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'fallback-secret-for-dev', // Change in production!
+  resave: false,
+  saveUninitialized: false,
+  cookie: { 
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -71,34 +86,59 @@ function saveTeams(teams) {
         return false;
     }
 }
+function checkAuth(req, res, next) {
+    if (req.session.team || req.path.includes('/login')) {
+      return next();
+    }
+    res.redirect('/index.html?message=Session+expired.+Please+login+again.&messageType=error');
+  }
+  
 
 // Login route
 app.post('/login', (req, res) => {
     const { teamName, password } = req.body;
     
-    console.log(`Login attempt: ${teamName}`); // Debug log
-    
-    // Check if team exists and password matches
     if (req.teams[teamName] && req.teams[teamName].password === password) {
-        console.log(`Successful login: ${teamName}`); // Debug log
-        
-        if (teamName.toLowerCase() === 'admin') { // Case-insensitive check
-            return res.redirect('/admin.html');
+      console.log(`Successful login: ${teamName}`);
+      
+      // Store session data
+      req.session.team = teamName;
+      req.session.save(err => {
+        if (err) {
+          console.error('Session save error:', err);
+          return res.redirect('/index.html?message=Login+failed&messageType=error');
         }
-        
-        // Check if team is disqualified
+  
+        if (teamName.toLowerCase() === 'admin') {
+          return res.redirect('/admin.html');
+        }
+  
         if (req.teams[teamName].disqualified) {
-            return res.redirect(`/dashboard.html?team=${encodeURIComponent(teamName)}&message=Your+team+has+been+disqualified.&messageType=error`);
+          return res.redirect(`/dashboard.html?team=${encodeURIComponent(teamName)}&message=Your+team+has+been+disqualified.&messageType=error`);
         }
-        
-        // Successful login for regular team
+  
         return res.redirect(`/dashboard.html?team=${encodeURIComponent(teamName)}`);
+      });
     } else {
-        console.log(`Failed login: ${teamName}`); // Debug log
-        // Failed login - stay on index.html with error message
-        return res.redirect('/index.html?message=Invalid+credentials.+Please+try+again.&messageType=error');
+      console.log(`Failed login: ${teamName}`);
+      return res.redirect('/index.html?message=Invalid+credentials.+Please+try+again.&messageType=error');
     }
-});
+  });
+  
+  // NEW: Session check for protected routes
+  app.get('/dashboard.html', checkAuth, (req, res) => {
+    if (!req.session.team) {
+      return res.redirect('/index.html');
+    }
+    res.sendFile(path.join(__dirname, 'public/dashboard.html'));
+  });
+  
+  app.get('/admin.html', checkAuth, (req, res) => {
+    if (req.session.team?.toLowerCase() !== 'admin') {
+      return res.redirect('/index.html');
+    }
+    res.sendFile(path.join(__dirname, 'public/admin.html'));
+  });
 // Add this near your other routes
 app.post('/create-admin', (req, res) => {
     const { password } = req.body;
@@ -411,5 +451,8 @@ app.post('/reset-points', (req, res) => {
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
-    console.log(`Data files: ${CODES_PATH}, ${TEAMS_PATH}`);
-});
+    // Optional: Clear all sessions on server restart
+    if (fs.existsSync(DATA_DIR + '/sessions')) {
+      fs.rmSync(DATA_DIR + '/sessions', { recursive: true });
+    }
+  });
