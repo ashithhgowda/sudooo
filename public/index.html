@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bomb Defusal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    /* Base Styles */
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Orbitron', 'Arial Black', sans-serif;
+      overflow: hidden;
+      background: #000;
+    }
+    
+    /* AJIET Header Styles */
+    .header {
+      position: absolute;
+      top: 10px;
+      width: 100%;
+      text-align: center;
+      z-index: 10;
+    }
+    
+    .institution {
+      color: #ff0000;
+      font-size: 18px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      margin-bottom: 3px;
+      text-shadow: 0 0 10px #ff0000;
+    }
+    
+    .ieee-branch {
+      color: #0066ff;
+      font-size: 14px;
+      letter-spacing: 3px;
+      margin-bottom: 10px;
+    }
+    
+    /* Intro Page Styles */
+    #intro-page {
+      background: radial-gradient(circle, #000000 0%, #1a1a1a 100%);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    
+    /* Bomb Styles */
+    #bomb-container {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      margin-bottom: 30px;
+    }
+    
+    #bomb {
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 30% 30%, #444, #111);
+      border-radius: 50%;
+      position: relative;
+      box-shadow: 
+        0 0 20px rgba(255, 50, 50, 0.8),
+        inset 0 -10px 30px rgba(0,0,0,0.7);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2;
+    }
+    
+    #bomb:hover {
+      transform: scale(1.05);
+      box-shadow: 
+        0 0 30px rgba(255, 50, 50, 1),
+        inset 0 -10px 40px rgba(0,0,0,0.8);
+    }
+    
+    #bomb:before {
+      content: "";
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 45px;
+      background: linear-gradient(to bottom, #777, #333);
+      border-radius: 5px;
+      z-index: 1;
+    }
+    
+    #bomb:after {
+      content: "";
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 15px;
+      height: 15px;
+      background: #ff3333;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #ff0000;
+      z-index: 3;
+    }
+    
+    /* Explosion Effect */
+    .explosion {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,100,0,0.8) 0%, rgba(255,50,0,0) 70%);
+      opacity: 0;
+      z-index: 1;
+    }
+    
+    /* Title Animation */
+    #title-container {
+      text-align: center;
+      min-height: 100px;
+      width: 100%;
+      max-width: 350px;
+    }
+    
+    #main-title {
+      color: #ff0000;
+      font-size: 28px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+      text-shadow: 0 0 15px #ff0000;
+      word-break: break-word;
+      white-space: normal;
+    }
+    
+    #sub-title {
+      color: #0066ff;
+      font-size: 14px;
+      letter-spacing: 4px;
+      opacity: 0;
+      line-height: 1.4;
+      word-break: break-word;
+      text-align: center;
+    }
+    
+    /* Login Page Styles */
+    #login-page {
+      display: none;
+      background: radial-gradient(circle, #000000 0%, #1a1a1a 100%);
+      height: 100vh;
+      color: white;
+      box-sizing: border-box;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    
+    .login-container {
+      width: 100%;
+      max-width: 350px;
+      margin: 0 auto;
+      padding: 30px 20px;
+      background: rgba(10, 10, 10, 0.8);
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+      border: 1px solid #ff0000;
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    
+    .logo {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 8px;
+      color: #ff0000;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px #ff0000;
+    }
+    
+    .welcome {
+      text-align: center;
+      font-size: 16px;
+      margin-bottom: 20px;
+      color: #0066ff;
+      letter-spacing: 1px;
+    }
+    
+    .input-group {
+      margin-bottom: 20px;
+    }
+    
+    .input-group label {
+      display: block;
+      margin-bottom: 6px;
+      color: #ccc;
+      font-weight: bold;
+      letter-spacing: 1px;
+      font-size: 14px;
+    }
+    
+    .input-group input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 5px;
+      background: rgba(30, 30, 30, 0.8);
+      color: white;
+      font-size: 14px;
+      border: 1px solid #333;
+      font-family: 'Orbitron', sans-serif;
+    }
+    
+    .input-group input:focus {
+      outline: none;
+      border-color: #ff0000;
+      box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+    }
+    
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      background: linear-gradient(to right, #ff0000, #990000);
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-family: 'Orbitron', sans-serif;
+    }
+    
+    .login-btn:hover {
+      background: linear-gradient(to right, #ff3333, #cc0000);
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
+    }
+    
+    /* Animations */
+    @keyframes explode {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(3); opacity: 0.8; }
+      100% { transform: scale(5); opacity: 0; }
+    }
+    
+    @keyframes flash {
+      0% { opacity: 0; }
+      50% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    
+    .explode {
+      animation: explode 0.8s forwards;
+    }
+    
+    .flash {
+      animation: flash 0.3s 3;
+    }
+    
+    /* Typewriter Effect */
+    .typewriter {
+      border-right: 3px solid #ff0000;
+      white-space: nowrap;
+      overflow: hidden;
+      display: inline-block;
+    }
+    
+    /* Responsive Styles */
+    @media (min-width: 768px) {
+      .header {
+        top: 20px;
+      }
+      
+      .institution {
+        font-size: 24px;
+        letter-spacing: 2px;
+      }
+      
+      .ieee-branch {
+        font-size: 18px;
+        letter-spacing: 5px;
+      }
+      
+      #bomb-container {
+        width: 200px;
+        height: 200px;
+        margin-bottom: 50px;
+      }
+      
+      #bomb:before {
+        top: -25px;
+        width: 40px;
+        height: 60px;
+      }
+      
+      #bomb:after {
+        top: -35px;
+        width: 20px;
+        height: 20px;
+      }
+      
+      #main-title {
+        font-size: 48px;
+        letter-spacing: 3px;
+      }
+      
+      #sub-title {
+        font-size: 18px;
+        letter-spacing: 8px;
+      }
+      
+      #title-container {
+        min-height: 120px;
+        max-width: 600px;
+      }
+      
+      .login-container {
+        max-width: 400px;
+        padding: 40px 30px;
+      }
+      
+      .logo {
+        font-size: 36px;
+      }
+      
+      .welcome {
+        font-size: 18px;
+      }
+      
+      .input-group input {
+        padding: 12px 15px;
+        font-size: 16px;
+      }
+      
+      .login-btn {
+        padding: 14px;
+        font-size: 16px;
+      }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="institution">AJIET</div>
+    <div class="ieee-branch">IEEE STUDENT BRANCH</div>
+  </div>
+  
+  <!-- Intro Page -->
+  <div id="intro-page">
+    <div id="bomb-container">
+      <div id="bomb"></div>
+    </div>
+    
+    <div id="title-container">
+      <div id="main-title"></div>
+      <div id="sub-title">DISARM OR DETONATE - THE FATE IS IN YOUR HANDS</div>
+    </div>
+    
+  </div>
+  
+  <!-- Login Page (hidden initially) -->
+  <div id="login-page">
+    <div class="login-container">
+      <div class="logo">BOMB DEFUSAL</div>
+      <div class="welcome">ACCESS RESTRICTED</div>
+      
+      <form action="/login" method="POST">
+        <div class="input-group">
+          <label>OPERATIVE ID</label>
+          <input type="text" name="teamName" required />
+        </div>
+        
+        <div class="input-group">
+          <label>CODE PHRASE</label>
+          <input type="password" name="password" required />
+        </div>
+        
+        <button type="submit" class="login-btn">AUTHENTICATE</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Typewriter effect for main title
+    function typeWriter(text, element, speed, callback) {
+      let i = 0;
+      element.innerHTML = '';
+      element.classList.add('typewriter');
+      
+      function typing() {
+        if (i < text.length) {
+          element.innerHTML += text.charAt(i);
+          i++;
+          setTimeout(typing, speed);
+        } else {
+          element.classList.remove('typewriter');
+          if (callback) callback();
+        }
+      }
+      
+      typing();
+    }
+    
+    // Create explosion particles
+    function createExplosion() {
+      const bomb = document.getElementById('bomb');
+      const container = document.getElementById('bomb-container');
+      
+      // Create 30 explosion particles
+      for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'explosion';
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.top = `${Math.random() * 100}%`;
+        particle.style.width = `${Math.random() * 100 + 50}px`;
+        particle.style.height = particle.style.width;
+        container.appendChild(particle);
+        
+        // Animate particles
+        setTimeout(() => {
+          particle.style.transition = `all ${Math.random() * 0.5 + 0.5}s ease-out`;
+          particle.style.transform = `translate(${(Math.random() - 0.5) * 300}px, ${(Math.random() - 0.5) * 300}px)`;
+          particle.style.opacity = '0';
+        }, 10);
+      }
+      
+      // Flash effect
+      document.body.classList.add('flash');
+      setTimeout(() => {
+        document.body.classList.remove('flash');
+      }, 1000);
+    }
+    
+    // Handle bomb click
+    document.getElementById('bomb').addEventListener('click', function() {
+      // Disable further clicks
+      this.style.pointerEvents = 'none';
+      
+      // Add explode animation
+      this.classList.add('explode');
+      createExplosion();
+      
+      // Type "BOMB DEFUSAL" letter by letter
+      typeWriter("BOMB DEFUSAL", document.getElementById('main-title'), 100, () => {
+        // Then show subtitle
+        document.getElementById('sub-title').style.opacity = '1';
+        
+        // After animation completes, show login page
+        setTimeout(function() {
+          document.getElementById('intro-page').style.display = 'none';
+          document.getElementById('login-page').style.display = 'block';
+        }, 2000);
+      });
+    });
+  </script>
+</body>
+</html>
