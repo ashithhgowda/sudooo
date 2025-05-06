@@ -1,46 +1,12 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "public/**/*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "server.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/login",
-      "dest": "/server.js",
-      "methods": ["POST"]
-    },
-    {
-      "src": "/submit-code",
-      "dest": "/server.js",
-      "methods": ["POST"]
-    },
-    {
-      "src": "/verify-clue",
-      "dest": "/server.js",
-      "methods": ["POST"]
-    },
-    {
-      "src": "/dashboard",
-      "dest": "/public/dashboard.html"
-    },
-    {
-      "src": "/admin",
-      "dest": "/public/admin.html"
-    },
-    {
-      "src": "/map",
-      "dest": "/public/map.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/public/index.html"
-    }
-  ]
-}
+    "version": 2,
+    "builds": [
+      { "src": "public/**/*.html", "use": "@vercel/static" },
+      { "src": "server.js", "use": "@vercel/node" }
+    ],
+    "routes": [
+      { "src": "/login", "dest": "/server.js", "methods": ["POST"] },
+      { "src": "/dashboard", "dest": "/public/dashboard.html", "status": 200 },
+      { "src": "/(.*)", "dest": "/public/index.html", "status": 200 }
+    ]
+  }
